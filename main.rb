@@ -3,6 +3,18 @@ require 'sinatra/reloader'
 require 'json'
 require 'metarman'
 
+before do
+  content_type :json
+end
+
+not_found do
+  JSON.pretty_generate({body: nil, error: "not found"})
+end
+
+error do
+  JSON.pretty_generate({body: nil, error: "something went wrong"})
+end
+
 get '/hc' do
   JSON.pretty_generate({body: 'server working!!', error: nil})
 end
@@ -14,16 +26,11 @@ get '/*'  do |icao|
     err.push("invalid parameter. please enter correct ICAO airport code.")
   end
 
-  data = Metarman.get_with_info(icao)
-  if data == nil
-    err.push("something went wrong")
-  end
+  # そもそもgem側でエラー投げてあげたほうがよさそう
 
-  # gem側でエラー投げてあげたほうがよさそう
-
-  if err.nil?
-    JSON.pretty_generate({body: nil, error: err.first})
-  else
+  if err.empty?
     JSON.pretty_generate({body: data, error: nil})
+  else
+    JSON.pretty_generate({body: nil, error: err.first})
   end
 end
