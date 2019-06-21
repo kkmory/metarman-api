@@ -26,6 +26,7 @@ get '/*'  do |icao|
     err.push("invalid parameter. please enter correct ICAO airport code.")
   end
 
+  data = Metarman.get_with_info(icao)
   # そもそもgem側でエラー投げてあげたほうがよさそう
 
   if err.empty?
